@@ -86,8 +86,8 @@ function CreateAccounts() {
     const email = generateEmail(firstName, lastName);
   
     try {
-      // Send a request to the Telegram bot to get the email and password
-      const telegramResponse = await fetch('/.netlify/functions/submit-account', {
+      // Send a request to the backend function
+      const response = await fetch('/.netlify/functions/submit-account', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,24 +98,27 @@ function CreateAccounts() {
           day,
           month,
           year,
+          email, // Include email
+          password, // Include password
         }),
       });
   
-      const telegramResult = await telegramResponse.json();
+      const result = await response.json();
   
-      if (telegramResult.success) {
-        // Update the task data with the email and password from the Telegram bot
+      if (result.success) {
+        // Update the task data with the confirmation key from the backend
         setTaskData({
           firstName,
           lastName,
           day,
           month,
           year,
-          email: telegramResult.email,
-          password: telegramResult.password,
+          email,
+          password,
+          confirmationKey: result.confirmationKey, // Add confirmation key
         });
       } else {
-        console.error('Failed to get email and password from Telegram bot');
+        console.error('Failed to submit account details:', result.message);
         setTaskData({
           firstName,
           lastName,
@@ -127,7 +130,7 @@ function CreateAccounts() {
         });
       }
     } catch (error) {
-      console.error('Error communicating with Telegram bot:', error);
+      console.error('Error submitting account details:', error);
       setTaskData({
         firstName,
         lastName,
