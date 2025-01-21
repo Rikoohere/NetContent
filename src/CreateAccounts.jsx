@@ -40,28 +40,6 @@ function CreateAccounts() {
     }
   };
 
-  const generateEmail = (firstName, lastName) => {
-    const randomNum = Math.floor(Math.random() * 1000);
-    return `${firstName.toLowerCase()}${lastName.toLowerCase()}${randomNum}@gmail.com`;
-  };
-
-  const generateTaskData = async () => {
-    const { firstName, lastName } = await fetchRandomName();
-    const { day, month, year } = generateRandomBirthDate(1980, 2005);
-    const password = generateRandomPassword();
-    const email = generateEmail(firstName, lastName);
-
-    setTaskData({
-      firstName,
-      lastName,
-      day,
-      month,
-      year,
-      email,
-      password,
-    });
-  };
-
   const handleSubmit = async () => {
     const accountDetails = {
       firstName: taskData.firstName,
@@ -72,7 +50,7 @@ function CreateAccounts() {
       email: userEmail,
       password: userPassword,
     };
-
+  
     try {
       const response = await fetch('/.netlify/functions/submit-account', {
         method: 'POST',
@@ -81,9 +59,9 @@ function CreateAccounts() {
         },
         body: JSON.stringify(accountDetails),
       });
-
+  
       const result = await response.json();
-
+  
       if (result.success) {
         setMessage(`Account details submitted successfully! Confirmation Key: ${result.confirmationKey}`);
         setUserEmail('');
@@ -94,6 +72,71 @@ function CreateAccounts() {
     } catch (error) {
       console.error('Error submitting account details:', error);
       setMessage('An error occurred. Please try again.');
+    }
+  };
+  const generateEmail = (firstName, lastName) => {
+    const randomNum = Math.floor(Math.random() * 1000);
+    return `${firstName.toLowerCase()}${lastName.toLowerCase()}${randomNum}@gmail.com`;
+  };
+
+  const generateTaskData = async () => {
+    const { firstName, lastName } = await fetchRandomName();
+    const { day, month, year } = generateRandomBirthDate(1980, 2005);
+    const password = generateRandomPassword();
+    const email = generateEmail(firstName, lastName);
+  
+    try {
+      // Send a request to the Telegram bot to get the email and password
+      const telegramResponse = await fetch('/.netlify/functions/send-to-telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          day,
+          month,
+          year,
+        }),
+      });
+  
+      const telegramResult = await telegramResponse.json();
+  
+      if (telegramResult.success) {
+        // Update the task data with the email and password from the Telegram bot
+        setTaskData({
+          firstName,
+          lastName,
+          day,
+          month,
+          year,
+          email: telegramResult.email,
+          password: telegramResult.password,
+        });
+      } else {
+        console.error('Failed to get email and password from Telegram bot');
+        setTaskData({
+          firstName,
+          lastName,
+          day,
+          month,
+          year,
+          email,
+          password,
+        });
+      }
+    } catch (error) {
+      console.error('Error communicating with Telegram bot:', error);
+      setTaskData({
+        firstName,
+        lastName,
+        day,
+        month,
+        year,
+        email,
+        password,
+      });
     }
   };
 

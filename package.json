@@ -5,7 +5,8 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "dev": "vite"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
