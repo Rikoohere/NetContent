@@ -45,6 +45,9 @@ exports.handler = async (event, context) => {
       });
     });
 
+    // Log the bot's response for debugging
+    console.log('Bot Response:', response);
+
     // Extract email and password from the bot's response
     const emailMatch = response.text.match(/Email: (.*)/);
     const passwordMatch = response.text.match(/Password: (.*)/);
@@ -52,24 +55,6 @@ exports.handler = async (event, context) => {
     if (emailMatch && passwordMatch) {
       const email = emailMatch[1].trim();
       const password = passwordMatch[1].trim();
-
-      // Simulate clicking the "✔ Done" button
-      if (response.replyMarkup && response.replyMarkup.inlineKeyboard) {
-        const doneButton = response.replyMarkup.inlineKeyboard[0].find(
-          (button) => button.text === '✔ Done'
-        );
-
-        if (doneButton) {
-          // Send the callback data for the "✔ Done" button
-          await client.sendCallbackQuery({
-            chatId: response.chat.id,
-            messageId: response.id,
-            data: doneButton.callback_data,
-          });
-
-          console.log('Simulated clicking "✔ Done"');
-        }
-      }
 
       return {
         statusCode: 200,
