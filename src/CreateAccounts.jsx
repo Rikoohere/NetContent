@@ -62,35 +62,7 @@ function CreateAccounts() {
       password,
     });
 
-    // Send account details to the backend
-    try {
-      const response = await fetch('/.netlify/functions/submit-account', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          day,
-          month,
-          year,
-          email,
-          password,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setMessage(`Account details submitted successfully! Confirmation Key: ${result.confirmationKey}`);
-      } else {
-        setMessage(result.message || 'Failed to submit account details. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error submitting account details:', error);
-      setMessage('An error occurred. Please try again.');
-    }
+    setMessage('Task data generated successfully!');
   };
 
   const handleSubmit = async () => {
@@ -105,6 +77,7 @@ function CreateAccounts() {
     };
 
     try {
+      // Send account details to the backend
       const response = await fetch('/.netlify/functions/submit-account', {
         method: 'POST',
         headers: {
