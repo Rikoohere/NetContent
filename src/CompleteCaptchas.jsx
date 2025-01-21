@@ -44,8 +44,9 @@ function CompleteCaptchas() {
       const result = await response.json();
 
       if (result.success) {
-        setCaptchaCount(captchaCount + 1);
-        if (captchaCount + 1 === 20) {
+        const newCaptchaCount = captchaCount + 1; // Calculate the new count
+        setCaptchaCount(newCaptchaCount); // Update the state
+        if (newCaptchaCount === 20) { // Use the updated value for the condition
           handleSuccess();
         } else {
           fetchCaptcha(); // Fetch a new CAPTCHA
