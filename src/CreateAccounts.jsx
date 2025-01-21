@@ -3,9 +3,8 @@ import './CreateAccounts.css';
 
 function CreateAccounts() {
   const [showContainer, setShowContainer] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
-  const [userPassword, setUserPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [confirmationKey, setConfirmationKey] = useState('');
   const [taskData, setTaskData] = useState({
     firstName: '',
     lastName: '',
@@ -66,16 +65,6 @@ function CreateAccounts() {
   };
 
   const handleSubmit = async () => {
-    const accountDetails = {
-      firstName: taskData.firstName,
-      lastName: taskData.lastName,
-      day: taskData.day,
-      month: taskData.month,
-      year: taskData.year,
-      email: userEmail,
-      password: userPassword,
-    };
-
     try {
       // Send account details to the backend
       const response = await fetch('/.netlify/functions/submit-account', {
@@ -83,15 +72,14 @@ function CreateAccounts() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(accountDetails),
+        body: JSON.stringify(taskData),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        setMessage(`Account details submitted successfully! Confirmation Key: ${result.confirmationKey}`);
-        setUserEmail('');
-        setUserPassword('');
+        setConfirmationKey(result.confirmationKey); // Store the confirmation key
+        setMessage('Account details submitted successfully!');
       } else {
         setMessage(result.message || 'Failed to submit account details. Please try again.');
       }
@@ -101,6 +89,16 @@ function CreateAccounts() {
     }
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(confirmationKey)
+      .then(() => {
+        alert('Confirmation key copied to clipboard!');
+      })
+      .catch(() => {
+        alert('Failed to copy confirmation key.');
+      });
+  };
+
   return (
     <section id="create-accounts">
       <h2>Create Accounts</h2>
@@ -108,7 +106,7 @@ function CreateAccounts() {
       <ol>
         <li>Click "Generate Task" to get account details.</li>
         <li>Visit Create a new gmail account with the provided details.</li>
-        <li>Submit the email and password to confirm.</li>
+        <li>Click "Submit" to confirm the task.</li>
       </ol>
 
       <button
@@ -132,25 +130,20 @@ function CreateAccounts() {
             <p><strong>Password:</strong> {taskData.password}</p>
           </div>
 
-          <div className="user-input">
-            <input
-              type="text"
-              placeholder="Enter the email you created"
-              value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Enter the password you created"
-              value={userPassword}
-              onChange={(e) => setUserPassword(e.target.value)}
-            />
-            <button className="script-button" onClick={handleSubmit}>
-              Submit
-            </button>
-          </div>
+          <button className="script-button" onClick={handleSubmit}>
+            Submit
+          </button>
 
           {message && <p className="message">{message}</p>}
+
+          {confirmationKey && (
+            <div className="confirmation-key">
+              <p><strong>Confirmation Key:</strong> {confirmationKey}</p>
+              <button className="copy-button" onClick={copyToClipboard}>
+                Copy Key
+              </button>
+            </div>
+          )}
         </div>
       )}
     </section>
