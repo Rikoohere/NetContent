@@ -1,55 +1,175 @@
-const fetch = require('node-fetch');
+import React, { useState } from 'react';
+import './CreateAccounts.css';
 
-const generateConfirmationKey = () => {
-  return Math.random().toString(36).substring(2, 10).toUpperCase();
-};
+function CreateAccounts() {
+  const [showContainer, setShowContainer] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [taskData, setTaskData] = useState({
+    firstName: '',
+    lastName: '',
+    day: '',
+    month: '',
+    year: '',
+    email: '',
+    password: '',
+  });
 
-exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ message: 'Method Not Allowed' }),
-    };
-  }
-
-  const { firstName, lastName, day, month, year, email, password } = JSON.parse(event.body);
-
-  if (!firstName || !lastName || !day || !month || !year || !email || !password) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ success: false, message: 'All fields are required' }),
-    };
-  }
-
-  const confirmationKey = generateConfirmationKey();
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL2;
-
-  const message = {
-    content: `📝 New Account Created!\n**First Name:** ${firstName}\n**Last Name:** ${lastName}\n**Date of Birth:** ${day}/${month}/${year}\n**Email:** ${email}\n**Password:** ${password}\n**Confirmation Key:** ${confirmationKey}`,
+  const generateRandomPassword = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+';
+    return Array.from({ length: 12 }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
   };
 
-  try {
-    const response = await fetch(webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(message),
-    });
+  const generateRandomBirthDate = (startYear, endYear) => {
+    const year = Math.floor(Math.random() * (endYear - startYear + 1)) + startYear;
+    const month = (`0${Math.floor(Math.random() * 12) + 1}`).slice(-2);
+    const day = (`0${Math.floor(Math.random() * 28) + 1}`).slice(-2);
+    return { day, month, year };
+  };
 
-    if (response.ok) {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ success: true, message: 'Account details submitted successfully!', confirmationKey }),
-      };
-    } else {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ success: false, message: 'Failed to send account details to Discord' }),
-      };
+  const fetchRandomName = async () => {
+    try {
+      const response = await fetch('https://randomuser.me/api/');
+      const data = await response.json();
+      const { first, last } = data.results[0].name;
+      return { firstName: first, lastName: last };
+    } catch (error) {
+      console.error('Error fetching random name:', error);
+      return { firstName: 'John', lastName: 'Doe' };
     }
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ success: false, message: 'Error sending account details to Discord' }),
+  };
+
+  const generateEmail = (firstName, lastName) => {
+    const randomNum = Math.floor(Math.random() * 1000);
+    return `${firstName.toLowerCase()}${lastName.toLowerCase()}${randomNum}@gmail.com`;
+  };
+
+  const generateTaskData = async () => {
+    const { firstName, lastName } = await fetchRandomName();
+    const { day, month, year } = generateRandomBirthDate(1980, 2005);
+    const password = generateRandomPassword();
+    const email = generateEmail(firstName, lastName);
+
+    setTaskData({
+      firstName,
+      lastName,
+      day,
+      month,
+      year,
+      email,
+      password,
+    });
+  };
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 8;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateEmail(userEmail)) {
+      setMessage('Please enter a valid email address.');
+      return;
+    }
+
+    if (!validatePassword(userPassword)) {
+      setMessage('Password must be at least 8 characters long.');
+      return;
+    }
+
+    const accountDetails = {
+      firstName: taskData.firstName,
+      lastName: taskData.lastName,
+      day: taskData.day,
+      month: taskData.month,
+      year: taskData.year,
+      email: userEmail,
+      password: userPassword,
     };
-  }
-};
+
+    try {
+      const response = await fetch('/.netlify/functions/submit-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(accountDetails),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setMessage(`Account details submitted successfully! Confirmation Key: ${result.confirmationKey}`);
+        setUserEmail('');
+        setUserPassword('');
+      } else {
+        setMessage(result.message || 'Failed to submit account details. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting account details:', error);
+      setMessage('An error occurred. Please try again.');
+    }
+  };
+
+  return (
+    <section id="create-accounts">
+      <h2>Create Accounts</h2>
+      <p>Earn $ for every account you create! Follow these steps:</p>
+      <ol>
+        <li>Click "Generate Task" to get account details.</li>
+        <li>Visit Create a new gmail account with the provided details.</li>
+        <li>Submit the email and password to confirm.</li>
+      </ol>
+
+      <button
+        className="script-button"
+        onClick={async () => {
+          setShowContainer(true);
+          await generateTaskData();
+        }}
+      >
+        Generate Task
+      </button>
+
+      {showContainer && (
+        <div className="task-container">
+          <h3>Task Details</h3>
+          <div className="task-data">
+            <p><strong>First Name:</strong> {taskData.firstName}</p>
+            <p><strong>Last Name:</strong> {taskData.lastName}</p>
+            <p><strong>Date of Birth:</strong> {taskData.day}/{taskData.month}/{taskData.year}</p>
+            <p><strong>Email:</strong> {taskData.email}</p>
+            <p><strong>Password:</strong> {taskData.password}</p>
+          </div>
+
+          <div className="user-input">
+            <input
+              type="text"
+              placeholder="Enter the email you created"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Enter the password you created"
+              value={userPassword}
+              onChange={(e) => setUserPassword(e.target.value)}
+            />
+            <button className="script-button" onClick={handleSubmit}>
+              Submit
+            </button>
+          </div>
+
+          {message && <p className="message">{message}</p>}
+        </div>
+      )}
+    </section>
+  );
+}
+
+export default CreateAccounts;
