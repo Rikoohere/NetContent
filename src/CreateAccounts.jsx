@@ -60,8 +60,6 @@ function CreateAccounts() {
       email,
       password,
     });
-
-    setMessage('Task data generated successfully!');
   };
 
   const handleSubmit = async () => {
@@ -79,12 +77,12 @@ function CreateAccounts() {
 
       if (result.success) {
         setConfirmationKey(result.confirmationKey); // Store the confirmation key
-        setMessage('Account details submitted successfully!');
+        setMessage('Task submitted successfully!');
       } else {
-        setMessage(result.message || 'Failed to submit account details. Please try again.');
+        setMessage(result.message || 'Failed to submit task. Please try again.');
       }
     } catch (error) {
-      console.error('Error submitting account details:', error);
+      console.error('Error submitting task:', error);
       setMessage('An error occurred. Please try again.');
     }
   };
@@ -134,16 +132,19 @@ function CreateAccounts() {
             Submit
           </button>
 
-          {message && <p className="message">{message}</p>}
-
           {confirmationKey && (
             <div className="confirmation-key">
-              <p><strong>Confirmation Key:</strong> {confirmationKey}</p>
+              <div className="key-box">
+                <span className="key-label">Confirmation Key:</span>
+                <span className="key-value">{confirmationKey}</span>
+              </div>
               <button className="copy-button" onClick={copyToClipboard}>
                 Copy Key
               </button>
             </div>
           )}
+
+          {message && <p className="message">{message}</p>}
         </div>
       )}
     </section>

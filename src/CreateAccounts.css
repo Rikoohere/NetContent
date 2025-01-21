@@ -86,60 +86,56 @@
   color: #f1c40f; /* Retro yellow */
 }
 
-.user-input {
-  margin-top: 20px;
-}
-
-.user-input input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 4px solid #e67e22; /* Orange border */
-  background-color: #34495e; /* Dark blue-gray */
-  color: #ffffff; /* White text */
-  font-family: 'Press Start 2P', cursive;
-  font-size: 12px;
-  box-shadow: 4px 4px 0 #e67e22; /* Pixelated shadow */
-}
-
-.user-input input::placeholder {
-  color: #bdc3c7; /* Light gray placeholder */
-}
-
-.user-input button {
-  width: 100%;
-}
-
-.message {
-  color: #f1c40f; /* Retro yellow */
-  font-size: 12px;
-  margin-top: 10px;
-  text-align: center;
-}
+/* Confirmation Key Styling */
 .confirmation-key {
   margin-top: 20px;
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 5px;
+  padding: 15px;
+  background-color: #1a2530; /* Dark background */
+  border: 4px solid #f1c40f; /* Retro yellow border */
+  box-shadow: 4px 4px 0 #f1c40f; /* Pixelated shadow */
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.confirmation-key p {
-  margin: 0;
+.key-box {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.key-label {
+  color: #f1c40f; /* Retro yellow */
+  font-size: 12px;
   font-weight: bold;
 }
 
+.key-value {
+  color: #ffffff; /* White text */
+  font-size: 14px;
+  font-family: 'Courier New', monospace; /* Monospace font for a techy look */
+}
+
 .copy-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
+  background-color: #f1c40f; /* Retro yellow */
+  border: 4px solid #e67e22; /* Orange border */
+  color: #2c3e50; /* Dark blue text */
+  font-family: 'Press Start 2P', cursive;
+  padding: 10px 20px;
+  font-size: 12px;
   cursor: pointer;
+  box-shadow: 4px 4px 0 #e67e22; /* Pixelated shadow */
 }
 
 .copy-button:hover {
-  background-color: #0056b3;
+  background-color: #e67e22; /* Orange background on hover */
+  border-color: #d35400; /* Darker orange border */
+}
+
+/* Message Styling */
+.message {
+  color: #f1c40f; /* Retro yellow */
+  font-size: 12px;
+  margin-top: 10px;
+  text-align: center;
 }
