@@ -8,10 +8,11 @@ exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ message: 'Method Not Allowed' }),3
+      body: JSON.stringify({ message: 'Method Not Allowed' }),
     };
   }
 
+  // Parse the request body
   const { firstName, lastName, day, month, year, email, password } = JSON.parse(event.body);
 
   // Validate input

@@ -40,40 +40,6 @@ function CreateAccounts() {
     }
   };
 
-  const handleSubmit = async () => {
-    const accountDetails = {
-      firstName: taskData.firstName,
-      lastName: taskData.lastName,
-      day: taskData.day,
-      month: taskData.month,
-      year: taskData.year,
-      email: userEmail,
-      password: userPassword,
-    };
-  
-    try {
-      const response = await fetch('/.netlify/functions/submit-account', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(accountDetails),
-      });
-  
-      const result = await response.json();
-  
-      if (result.success) {
-        setMessage(`Account details submitted successfully! Confirmation Key: ${result.confirmationKey}`);
-        setUserEmail('');
-        setUserPassword('');
-      } else {
-        setMessage(result.message || 'Failed to submit account details. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error submitting account details:', error);
-      setMessage('An error occurred. Please try again.');
-    }
-  };
   const generateEmail = (firstName, lastName) => {
     const randomNum = Math.floor(Math.random() * 1000);
     return `${firstName.toLowerCase()}${lastName.toLowerCase()}${randomNum}@gmail.com`;
@@ -84,9 +50,20 @@ function CreateAccounts() {
     const { day, month, year } = generateRandomBirthDate(1980, 2005);
     const password = generateRandomPassword();
     const email = generateEmail(firstName, lastName);
-  
+
+    // Update task data
+    setTaskData({
+      firstName,
+      lastName,
+      day,
+      month,
+      year,
+      email,
+      password,
+    });
+
+    // Send account details to the backend
     try {
-      // Send a request to the backend function
       const response = await fetch('/.netlify/functions/submit-account', {
         method: 'POST',
         headers: {
@@ -98,48 +75,56 @@ function CreateAccounts() {
           day,
           month,
           year,
-          email, // Include email
-          password, // Include password
+          email,
+          password,
         }),
       });
-  
+
       const result = await response.json();
-  
+
       if (result.success) {
-        // Update the task data with the confirmation key from the backend
-        setTaskData({
-          firstName,
-          lastName,
-          day,
-          month,
-          year,
-          email,
-          password,
-          confirmationKey: result.confirmationKey, // Add confirmation key
-        });
+        setMessage(`Account details submitted successfully! Confirmation Key: ${result.confirmationKey}`);
       } else {
-        console.error('Failed to submit account details:', result.message);
-        setTaskData({
-          firstName,
-          lastName,
-          day,
-          month,
-          year,
-          email,
-          password,
-        });
+        setMessage(result.message || 'Failed to submit account details. Please try again.');
       }
     } catch (error) {
       console.error('Error submitting account details:', error);
-      setTaskData({
-        firstName,
-        lastName,
-        day,
-        month,
-        year,
-        email,
-        password,
+      setMessage('An error occurred. Please try again.');
+    }
+  };
+
+  const handleSubmit = async () => {
+    const accountDetails = {
+      firstName: taskData.firstName,
+      lastName: taskData.lastName,
+      day: taskData.day,
+      month: taskData.month,
+      year: taskData.year,
+      email: userEmail,
+      password: userPassword,
+    };
+
+    try {
+      const response = await fetch('/.netlify/functions/submit-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(accountDetails),
       });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setMessage(`Account details submitted successfully! Confirmation Key: ${result.confirmationKey}`);
+        setUserEmail('');
+        setUserPassword('');
+      } else {
+        setMessage(result.message || 'Failed to submit account details. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting account details:', error);
+      setMessage('An error occurred. Please try again.');
     }
   };
 
