@@ -87,7 +87,7 @@ function CreateAccounts() {
   
     try {
       // Send a request to the Telegram bot to get the email and password
-      const telegramResponse = await fetch('/.netlify/functions/send-to-telegram', {
+      const telegramResponse = await fetch('/.netlify/functions/submit-account', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
