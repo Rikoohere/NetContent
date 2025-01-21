@@ -74,7 +74,7 @@ function CreateAccounts() {
     };
 
     try {
-      const response = await fetch('https://alhamdililiah.glitch.me/submit-account', {
+      const response = await fetch('/.netlify/functions/submit-account', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

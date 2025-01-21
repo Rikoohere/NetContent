@@ -15,7 +15,7 @@ function CompleteCaptchas() {
 
   const fetchCaptcha = async () => {
     try {
-      const response = await fetch('https://alhamdililiah.glitch.me/captcha');
+      const response = await fetch('/.netlify/functions/captcha');
       const svgText = await response.text();
       setCaptchaImage(`data:image/svg+xml;base64,${btoa(svgText)}`);
     } catch (error) {
@@ -26,7 +26,7 @@ function CompleteCaptchas() {
   const validateCaptcha = async () => {
     const userAnswer = userInput.trim();
     try {
-      const response = await fetch('https://alhamdililiah.glitch.me/validate', {
+      const response = await fetch('/.netlify/functions/validate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -65,7 +65,7 @@ function CompleteCaptchas() {
 
     // Save completion data to the backend
     try {
-      const response = await fetch('https://alhamdililiah.glitch.me/save-completion', {
+      const response = await fetch('/.netlify/functions/save-completion', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
