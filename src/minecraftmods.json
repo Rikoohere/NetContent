@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "title": "Endermorphosis Mod: Transform Your World",
+    "image": "https://cdndn.s3.us-west-1.amazonaws.com/minecraft/mods/endermorphosis-mod_image.jpeg",
+    "link": "https://www.modcraftforge.com/minecraft/endermorphosis-mod?pub=3209161"
+  },
+  {
+    "id": 2,
+    "title": "Illager Expansion Recrafted: New Horizons",
+    "image": "https://cdndn.s3.us-west-1.amazonaws.com/minecraft/mods/illager-expansion-recrafted_image.jpeg",
+    "link": "https://www.modcraftforge.com/minecraft/illager-expansion-recrafted?pub=3209161"
+  },
+  {
+    "id": 3,
+    "title": "Epic Knights: Ice and Fire - Legendary Battles",
+    "image": "https://cdndn.s3.us-west-1.amazonaws.com/minecraft/mods/epic-knights-ice-and-fire_image.jpeg",
+    "link": "https://www.modcraftforge.com/minecraft/epic-knights-ice-and-fire?pub=3209161"
+  }
+]
