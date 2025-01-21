@@ -17,10 +17,10 @@ exports.handler = async (event, context) => {
     };
   }
 
-  const apiId = process.env.TELEGRAM_API_ID; // Get this from https://my.telegram.org
-  const apiHash = process.env.TELEGRAM_API_HASH; // Get this from https://my.telegram.org
-  const phoneNumber = process.env.TELEGRAM_PHONE_NUMBER; // Your Telegram account phone number
-  const botUsername = process.env.TELEGRAM_BOT_USERNAME; // The username of the bot (e.g., @mybot)
+  const apiId = "21100200"; // Get this from https://my.telegram.org
+  const apiHash = "25c3a7d71491cf38580b9ee68753af25"; // Get this from https://my.telegram.org
+  const phoneNumber = "0540032675"; // Your Telegram account phone number
+  const botUsername = "@GmailFarmerBot"; // The username of the bot (e.g., @mybot)
 
   const client = new TgFancy({
     apiId,
