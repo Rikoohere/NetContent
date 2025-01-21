@@ -12,26 +12,34 @@ function CompleteCaptchas() {
   const [userInput, setUserInput] = useState(''); // User's input
   const [captchaCount, setCaptchaCount] = useState(0); // Number of captchas solved
   const [message, setMessage] = useState(''); // Message to display to the user
+  const [captchaToken, setCaptchaToken] = useState(''); // Token for CAPTCHA validation
 
+  // Fetch CAPTCHA image and token
   const fetchCaptcha = async () => {
     try {
       const response = await fetch('/.netlify/functions/captcha');
-      const svgText = await response.text();
+      const data = await response.json(); // Assuming the function returns { body: SVG, token: JWT }
+      const svgText = data.body;
       setCaptchaImage(`data:image/svg+xml;base64,${btoa(svgText)}`);
+      setCaptchaToken(data.token); // Store the token for validation
     } catch (error) {
       console.error('Error fetching captcha:', error);
     }
   };
 
+  // Validate CAPTCHA
   const validateCaptcha = async () => {
     const userAnswer = userInput.trim();
     try {
       const response = await fetch('/.netlify/functions/validate', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: `answer=${encodeURIComponent(userAnswer)}`,
+        body: JSON.stringify({
+          answer: userAnswer,
+          token: captchaToken, // Pass the token for validation
+        }),
       });
       const result = await response.json();
 
@@ -40,7 +48,7 @@ function CompleteCaptchas() {
         if (captchaCount + 1 === 20) {
           handleSuccess();
         } else {
-          fetchCaptcha();
+          fetchCaptcha(); // Fetch a new CAPTCHA
         }
         setMessage('Correct! Moving to the next captcha.');
       } else {

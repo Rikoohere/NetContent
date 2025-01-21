@@ -1,4 +1,7 @@
 const svgCaptcha = require('svg-captcha');
+const jwt = require('jsonwebtoken');
+
+const SECRET = process.env.SECRET_KEY;
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'GET') {
@@ -11,16 +14,13 @@ exports.handler = async (event, context) => {
   // Generate a new CAPTCHA
   const captcha = svgCaptcha.create();
 
-  // Set a cookie with the CAPTCHA answer
-  const cookie = `captchaAnswer=${captcha.text}; Path=/; HttpOnly; SameSite=Strict; Max-Age=300`; // Expires in 5 minutes
+  // Create a signed token with the CAPTCHA answer
+  const token = jwt.sign({ answer: captcha.text }, SECRET, { expiresIn: '5m' });
 
-  // Return the CAPTCHA image as an SVG with the cookie
+  // Return the CAPTCHA image as an SVG with the token
   return {
     statusCode: 200,
-    headers: {
-      'Content-Type': 'image/svg+xml',
-      'Set-Cookie': cookie,
-    },
-    body: captcha.data,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ body: captcha.data, token }),
   };
 };
