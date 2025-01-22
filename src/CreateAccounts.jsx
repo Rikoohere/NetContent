@@ -24,7 +24,7 @@ function CreateAccounts() {
       const result = await response.json();
       if (result.success) {
         setTaskId(result.taskId); // Store the task ID
-        console.log(result.taskId)
+        console.log('Task ID:', result.taskId);
         pollForAccountDetails(result.taskId); // Start polling for email and password
       } else {
         setMessage('Failed to generate task. Please try again.');
@@ -38,15 +38,24 @@ function CreateAccounts() {
   const pollForAccountDetails = async (taskId) => {
     const interval = setInterval(async () => {
       try {
-        console.log(fetch(`/.netlify/functions/get-task?taskId=${taskId}`))
+        console.log('Polling for task details...');
         const response = await fetch(`/.netlify/functions/get-task?taskId=${taskId}`);
+        console.log('Response:', response);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         const result = await response.json();
-  
+        console.log('Result:', result);
+
         if (result.success && result.email && result.password) {
           clearInterval(interval); // Stop polling
           setIsLoading(false);
           setTaskData({ email: result.email, password: result.password });
           setMessage('Email and password received!');
+        } else {
+          console.log('Waiting for admin response...');
         }
       } catch (error) {
         console.error('Error polling for account details:', error);
@@ -56,6 +65,7 @@ function CreateAccounts() {
       }
     }, 5000); // Poll every 5 seconds
   };
+
   const handleSubmit = async () => {
     try {
       // Send confirmation to Netlify function
@@ -76,6 +86,32 @@ function CreateAccounts() {
       }
     } catch (error) {
       console.error('Error submitting task:', error);
+      setMessage('An error occurred. Please try again.');
+    }
+  };
+
+  const handleUpdateTask = async () => {
+    try {
+      const response = await fetch('/.netlify/functions/update-task', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          taskId: taskId,
+          email: 'test@gmail.com',
+          password: 'Password123!',
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setMessage('Task updated successfully!');
+      } else {
+        setMessage(result.message || 'Failed to update task. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
       setMessage('An error occurred. Please try again.');
     }
   };
@@ -116,6 +152,10 @@ function CreateAccounts() {
           {message && <p className="message">{message}</p>}
         </div>
       )}
+
+      <button className="script-button" onClick={handleUpdateTask}>
+        Update Task (Test)
+      </button>
     </section>
   );
 }
