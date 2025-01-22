@@ -1,6 +1,4 @@
-// update-task.js
 const axios = require('axios');
-const { v4: uuidv4 } = require('uuid');
 
 // Telegram Bot Token
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -10,7 +8,7 @@ const tasks = require('./tasks'); // Shared tasks object
 // Function to call the update-task Netlify function
 const updateTask = async (taskId, email, password) => {
   try {
-    const response = await axios.post('https://your-netlify-site.netlify.app/.netlify/functions/update-task', {
+    const response = await axios.post('https://netcontent.netlify.app/.netlify/functions/update-task', {
       taskId,
       email,
       password,
@@ -74,7 +72,7 @@ exports.handler = async (event, context) => {
 
   // Handle /start command
   if (text === '/start') {
-    const taskId = uuidv4(); // Generate a unique task ID
+    const taskId = require('crypto').randomBytes(8).toString('hex'); // Generate a unique task ID
 
     // Store the task in memory
     tasks[taskId] = { status: 'pending' };
