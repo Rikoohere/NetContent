@@ -1,4 +1,3 @@
-// netlify/functions/get-task.js
 const tasks = require('./tasks');
 
 exports.handler = async (event, context) => {
