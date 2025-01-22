@@ -1,4 +1,5 @@
-const tasks = {}; // In-memory storage (replace with a database in production)
+// netlify/functions/update-task.js
+const tasks = require('./tasks');
 
 exports.handler = async (event, context) => {
   const { taskId, email, password } = JSON.parse(event.body);
