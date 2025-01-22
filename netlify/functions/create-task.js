@@ -1,13 +1,22 @@
 const axios = require('axios');
-const { v4: uuidv4 } = require('uuid');
 
 // Telegram Bot Token
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 const tasks = require('./tasks'); // Shared tasks object
 
+// Function to generate a random alphanumeric taskId
+const generateTaskId = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let taskId = '';
+  for (let i = 0; i < 10; i++) {
+    taskId += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return taskId;
+};
+
 exports.handler = async (event, context) => {
-  const taskId = uuidv4(); // Generate a unique task ID
+  const taskId = generateTaskId(); // Generate a simple task ID
 
   try {
     // Store the task in memory
