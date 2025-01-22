@@ -24,6 +24,7 @@ function CreateAccounts() {
       const result = await response.json();
       if (result.success) {
         setTaskId(result.taskId); // Store the task ID
+        console.log(result.taskId)
         pollForAccountDetails(result.taskId); // Start polling for email and password
       } else {
         setMessage('Failed to generate task. Please try again.');
@@ -37,6 +38,7 @@ function CreateAccounts() {
   const pollForAccountDetails = async (taskId) => {
     const interval = setInterval(async () => {
       try {
+        console.log(fetch(`/.netlify/functions/get-task?taskId=${taskId}`))
         const response = await fetch(`/.netlify/functions/get-task?taskId=${taskId}`);
         const result = await response.json();
   
