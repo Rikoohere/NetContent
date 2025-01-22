@@ -39,7 +39,7 @@ function CreateAccounts() {
       try {
         const response = await fetch(`/.netlify/functions/get-task?taskId=${taskId}`);
         const result = await response.json();
-
+  
         if (result.success && result.email && result.password) {
           clearInterval(interval); // Stop polling
           setIsLoading(false);
@@ -54,7 +54,6 @@ function CreateAccounts() {
       }
     }, 5000); // Poll every 5 seconds
   };
-
   const handleSubmit = async () => {
     try {
       // Send confirmation to Netlify function
