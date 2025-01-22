@@ -29,11 +29,6 @@ function Home() {
           <p>🎮 Welcome to <strong>NetContent</strong>! 🎉</p>
           <p>Your ultimate destination for the latest Roblox scripts, gaming tips, and money-making guides. Dive in and explore!</p>
         </div>
-        <p>
-            <a href="https://playabledownload.com/show.php?l=0&u=1781210&id=66952" target="_blank">
-              Click here for a special offer!
-            </a>
-          </p>
         <div className="updates">
           <h3>📢 Latest Updates</h3>
           <ul>
