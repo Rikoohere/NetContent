@@ -6,16 +6,16 @@ export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
-      external: ['firebase/app', 'firebase/database'],
+      // No need to mark Firebase modules as external
     },
     outDir: "dist"
   },
   server: {
-    host:"0.0.0.0",
-    port:3000,
+    host: "0.0.0.0",
+    port: 3000,
     strictPort: true,
     hmr: {
-      clientPort: 443 // Run the websocket server on the SSL port
-    }
-  }
+      clientPort: 443, // Run the websocket server on the SSL port
+    },
+  },
 });
