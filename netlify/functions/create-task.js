@@ -1,28 +1,33 @@
-const admin = require('../firebaseAdmin');
+const admin = require("firebase-admin");
 
-exports.handler = async (event, context) => {
-  const { taskId, email, password } = JSON.parse(event.body);
+// Initialize Firebase Admin SDK if not already initialized
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)),
+  });
+}
 
-  if (!taskId || !email || !password) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ success: false, message: 'Missing task details' }),
-    };
-  }
+const db = admin.firestore();
 
+exports.handler = async () => {
   try {
-    const taskRef = admin.database().ref(`tasks/${taskId}`);
-    await taskRef.update({ email, password, status: 'completed', completedAt: admin.firestore.FieldValue.serverTimestamp() });
+    const taskId = `task-${Date.now()}`;
+    await db.collection("tasks").doc(taskId).set({
+      email: null,
+      password: null,
+      createdAt: Date.now(),
+      status: "pending",
+    });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, message: 'Task submitted successfully' }),
+      body: JSON.stringify({ success: true, taskId }),
     };
   } catch (error) {
-    console.error('Error confirming task:', error);
+    console.error("Error creating task:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, message: 'Error confirming task' }),
+      body: JSON.stringify({ success: false, message: "Failed to create task." }),
     };
   }
 };
