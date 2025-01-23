@@ -1,42 +1,35 @@
-const axios = require('axios');
-
-// Telegram Bot Token
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
-const tasks = require('./tasks'); // Shared tasks object
-
-// Function to generate a random alphanumeric taskId
-const generateTaskId = () => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let taskId = '';
-  for (let i = 0; i < 10; i++) {
-    taskId += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return taskId;
-};
+// netlify/functions/create-task.js
+const db = require('./firebase');
 
 exports.handler = async (event, context) => {
-  const taskId = generateTaskId(); // Generate a simple task ID
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ message: 'Method Not Allowed' }),
+    };
+  }
 
   try {
-    // Store the task in memory
-    tasks[taskId] = { status: 'pending' };
+    const taskId = Date.now().toString(); // Generate a unique task ID
+    const task = {
+      taskId,
+      status: 'pending',
+      date: new Date().toISOString(),
+      email: null,
+      password: null,
+    };
 
-    // Notify admin via Telegram
-    await axios.post(`${TELEGRAM_API_URL}/sendMessage`, {
-      chat_id: process.env.ADMIN_CHAT_ID,
-      text: `📝 New Task Request!\nTask ID: ${taskId}\nPlease respond with:\n/respond ${taskId} <email> <password>`,
-    });
+    // Save the task to Firebase Realtime Database
+    await db.ref(`tasks/${taskId}`).set(task);
 
     return {
       statusCode: 200,
       body: JSON.stringify({ success: true, taskId }),
     };
   } catch (error) {
-    console.error('Error sending Telegram message:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, message: 'Failed to create task.' }),
+      body: JSON.stringify({ success: false, message: 'Internal Server Error' }),
     };
   }
 };
