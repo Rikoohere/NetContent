@@ -1,21 +1,28 @@
-// netlify/functions/create-task.js
-exports.handler = async (event, context) => {
-  try {
-    // Generate a random task ID (you might use a more robust method in production)
-    const taskId = `task-${Math.floor(Math.random() * 10000)}`;
+const admin = require('../firebaseAdmin');
 
-    // Save the task info to a database or storage (e.g., Firebase, MongoDB, etc.)
-    // For simplicity, here we're just sending back the taskId
+exports.handler = async (event, context) => {
+  const { taskId, email, password } = JSON.parse(event.body);
+
+  if (!taskId || !email || !password) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ success: false, message: 'Missing task details' }),
+    };
+  }
+
+  try {
+    const taskRef = admin.database().ref(`tasks/${taskId}`);
+    await taskRef.update({ email, password, status: 'completed', completedAt: admin.firestore.FieldValue.serverTimestamp() });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, taskId }),
+      body: JSON.stringify({ success: true, message: 'Task submitted successfully' }),
     };
   } catch (error) {
-    console.error('Error creating task:', error);
+    console.error('Error confirming task:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, message: 'Failed to create task' }),
+      body: JSON.stringify({ success: false, message: 'Error confirming task' }),
     };
   }
 };

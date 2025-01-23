@@ -1,7 +1,8 @@
-// netlify/functions/get-task.js
+const admin = require('../firebaseAdmin');
+
 exports.handler = async (event, context) => {
   const { taskId } = event.queryStringParameters;
-  
+
   if (!taskId) {
     return {
       statusCode: 400,
@@ -10,18 +11,19 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Simulate waiting for account details (in a real scenario, query the database)
-    // For now, we'll simulate that after a delay, account details are found
-    const fakeEmail = 'user@example.com';
-    const fakePassword = 'password123';
+    const taskSnapshot = await admin.database().ref(`tasks/${taskId}`).once('value');
+    const taskData = taskSnapshot.val();
+
+    if (!taskData) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ success: false, message: 'Task not found' }),
+      };
+    }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        success: true,
-        email: fakeEmail,
-        password: fakePassword,
-      }),
+      body: JSON.stringify({ success: true, taskData }),
     };
   } catch (error) {
     console.error('Error fetching task details:', error);
