@@ -10,6 +10,29 @@ function CreateAccounts() {
     password: '',
   });
   const [taskId, setTaskId] = useState(null);
+  const [status, setStatus] = useState('Offline'); // Track online/offline status
+  const [timeLeft, setTimeLeft] = useState(null); // Track the countdown for task submission
+
+  const checkOnlineStatus = async () => {
+    try {
+      const response = await fetch('/.netlify/functions/check-status'); // Netlify function to check the status
+      const result = await response.json();
+      if (result.success) {
+        setStatus('Online');
+      } else {
+        setStatus('Offline');
+      }
+    } catch (error) {
+      setStatus('Offline');
+      console.error('Error checking status:', error);
+    }
+  };
+
+  useEffect(() => {
+    checkOnlineStatus();
+    const interval = setInterval(checkOnlineStatus, 30000); // Check every 30 seconds to keep status updated
+    return () => clearInterval(interval);
+  }, []);
 
   const generateTaskData = async () => {
     setIsLoading(true);
@@ -26,6 +49,7 @@ function CreateAccounts() {
         setTaskId(result.taskId); // Store the task ID
         console.log('Task ID:', result.taskId);
         pollForAccountDetails(result.taskId); // Start polling for email and password
+        setTimeLeft(10 * 60); // Set timer for 10 minutes (in seconds)
       } else {
         setMessage('Failed to generate task. Please try again.');
       }
@@ -40,14 +64,7 @@ function CreateAccounts() {
       try {
         console.log('Polling for task details...');
         const response = await fetch(`/.netlify/functions/get-task?taskId=${taskId}`);
-        console.log('Response:', response);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const result = await response.json();
-        console.log('Result:', result);
 
         if (result.success && result.email && result.password) {
           clearInterval(interval); // Stop polling
@@ -90,31 +107,22 @@ function CreateAccounts() {
     }
   };
 
-  const handleUpdateTask = async () => {
-    try {
-      const response = await fetch('/.netlify/functions/update-task', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          taskId: taskId,
-          email: 'test@gmail.com',
-          password: 'Password123!',
-        }),
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        setMessage('Task updated successfully!');
-      } else {
-        setMessage(result.message || 'Failed to update task. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error updating task:', error);
-      setMessage('An error occurred. Please try again.');
+  const handleTimeCountdown = () => {
+    if (timeLeft > 0) {
+      setTimeLeft(timeLeft - 1);
+    } else {
+      // Time is up, mark task as ready or handle expiration
+      setMessage('Time expired. Task will be marked as ready.');
+      // Here you might call a function to update the task to "Ready"
     }
   };
+
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timer = setInterval(handleTimeCountdown, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [timeLeft]);
 
   return (
     <section id="create-accounts">
@@ -127,10 +135,12 @@ function CreateAccounts() {
         <li>Click "Submit" to confirm the task.</li>
       </ol>
 
+      <p className={`status ${status === 'Online' ? 'online' : 'offline'}`}>{status}</p>
+
       <button
         className="script-button"
         onClick={generateTaskData}
-        disabled={isLoading}
+        disabled={isLoading || status !== 'Online'}
       >
         {isLoading ? 'Generating...' : 'Generate Task'}
       </button>
@@ -145,6 +155,23 @@ function CreateAccounts() {
             <p><strong>Password:</strong> {taskData.password}</p>
           </div>
 
+          <div className="task-time">
+            <p><strong>Time Left:</strong> {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</p>
+          </div>
+
+          <input
+            type="email"
+            placeholder="Enter Email"
+            value={taskData.email}
+            onChange={(e) => setTaskData({ ...taskData, email: e.target.value })}
+          />
+          <input
+            type="password"
+            placeholder="Enter Password"
+            value={taskData.password}
+            onChange={(e) => setTaskData({ ...taskData, password: e.target.value })}
+          />
+
           <button className="script-button" onClick={handleSubmit}>
             Submit
           </button>
@@ -152,10 +179,6 @@ function CreateAccounts() {
           {message && <p className="message">{message}</p>}
         </div>
       )}
-
-      <button className="script-button" onClick={handleUpdateTask}>
-        Update Task (Test)
-      </button>
     </section>
   );
 }

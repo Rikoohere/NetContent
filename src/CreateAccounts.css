@@ -1,141 +1,21 @@
-/* Section Styling */
-#create-accounts {
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 800px;
-  background-color: #34495e; /* Dark blue-gray */
-  border: 4px solid #2c3e50; /* Darker border */
-  border-radius: 0; /* Remove rounded corners */
-  box-shadow: 4px 4px 0 #1a2530; /* Pixelated shadow */
-}
-
-#create-accounts h2 {
-  color: #f1c40f; /* Retro yellow for headings */
-  font-size: 20px;
-  margin-bottom: 20px; /* Added space below the heading */
-}
-
-#create-accounts p {
-  color: #ffffff; /* White text */
-  font-size: 12px;
-  line-height: 1.5;
-  margin-bottom: 20px; /* Added space below the paragraph */
-}
-
-#create-accounts ol {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-#create-accounts li {
-  margin-bottom: 20px; /* Added space between steps */
-  font-size: 12px;
-  color: #ffffff; /* White text */
-  padding-left: 20px;
-  position: relative;
-}
-
-#create-accounts li::before {
-  content: '▶'; /* Retro arrow bullet */
-  color: #f1c40f; /* Retro yellow */
-  position: absolute;
-  left: 0;
-}
-
-#create-accounts .script-button {
-  background-color: #f1c40f; /* Retro yellow */
-  border: 4px solid #e67e22; /* Orange border */
-  color: #2c3e50; /* Dark blue text */
-  font-family: 'Press Start 2P', cursive;
-  padding: 10px 20px;
-  font-size: 12px;
-  cursor: pointer;
-  box-shadow: 4px 4px 0 #e67e22; /* Pixelated shadow */
-  width: 100%; /* Full width */
-  margin-top: 20px; /* Added space above the button */
-}
-
-#create-accounts .script-button:hover {
-  background-color: #e67e22; /* Orange background on hover */
-  border-color: #d35400; /* Darker orange border */
-}
-
-/* Task Container Styling */
-.task-container {
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #2c3e50; /* Darker blue-gray */
-  border: 4px solid #1a2530; /* Dark border */
-  box-shadow: 4px 4px 0 #1a2530; /* Pixelated shadow */
-}
-
-.task-container h3 {
-  color: #f1c40f; /* Retro yellow */
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.task-data p {
-  color: #ffffff; /* White text */
-  font-size: 12px;
-  margin-bottom: 10px;
-}
-
-.task-data strong {
-  color: #f1c40f; /* Retro yellow */
-}
-
-/* Confirmation Key Styling */
-.confirmation-key {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #1a2530; /* Dark background */
-  border: 4px solid #f1c40f; /* Retro yellow border */
-  box-shadow: 4px 4px 0 #f1c40f; /* Pixelated shadow */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.key-box {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.key-label {
-  color: #f1c40f; /* Retro yellow */
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.key-value {
-  color: #ffffff; /* White text */
+/* Status Styling */
+.status {
   font-size: 14px;
-  font-family: 'Courier New', monospace; /* Monospace font for a techy look */
-}
-
-.copy-button {
-  background-color: #f1c40f; /* Retro yellow */
-  border: 4px solid #e67e22; /* Orange border */
-  color: #2c3e50; /* Dark blue text */
-  font-family: 'Press Start 2P', cursive;
-  padding: 10px 20px;
-  font-size: 12px;
-  cursor: pointer;
-  box-shadow: 4px 4px 0 #e67e22; /* Pixelated shadow */
-}
-
-.copy-button:hover {
-  background-color: #e67e22; /* Orange background on hover */
-  border-color: #d35400; /* Darker orange border */
-}
-
-/* Message Styling */
-.message {
-  color: #f1c40f; /* Retro yellow */
-  font-size: 12px;
-  margin-top: 10px;
   text-align: center;
+  margin-top: 20px;
+}
+
+.status.online {
+  color: #2ecc71; /* Green for online */
+}
+
+.status.offline {
+  color: #e74c3c; /* Red for offline */
+}
+
+/* Countdown Timer Styling */
+.task-time {
+  font-size: 14px;
+  color: #f1c40f; /* Yellow for timer */
+  margin-top: 10px;
 }

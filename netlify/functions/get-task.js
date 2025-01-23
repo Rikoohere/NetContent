@@ -1,40 +1,33 @@
 // netlify/functions/get-task.js
-const db = require('./firebase');
-
 exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'GET') {
+  const { taskId } = event.queryStringParameters;
+  
+  if (!taskId) {
     return {
-      statusCode: 405,
-      body: JSON.stringify({ message: 'Method Not Allowed' }),
+      statusCode: 400,
+      body: JSON.stringify({ success: false, message: 'Task ID is required' }),
     };
   }
 
   try {
-    const { taskId } = event.queryStringParameters;
-
-    // Retrieve the task from Firebase
-    const snapshot = await db.ref(`tasks/${taskId}`).once('value');
-    const task = snapshot.val();
-
-    if (!task) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ success: false, message: 'Task not found' }),
-      };
-    }
+    // Simulate waiting for account details (in a real scenario, query the database)
+    // For now, we'll simulate that after a delay, account details are found
+    const fakeEmail = 'user@example.com';
+    const fakePassword = 'password123';
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
-        email: task.email,
-        password: task.password,
+        email: fakeEmail,
+        password: fakePassword,
       }),
     };
   } catch (error) {
+    console.error('Error fetching task details:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, message: 'Internal Server Error' }),
+      body: JSON.stringify({ success: false, message: 'Error fetching task details' }),
     };
   }
 };

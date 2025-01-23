@@ -1,28 +1,27 @@
 // netlify/functions/confirm-task.js
-const db = require('./firebase');
-
 exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
+  const { taskId, email, password } = JSON.parse(event.body);
+
+  if (!taskId || !email || !password) {
     return {
-      statusCode: 405,
-      body: JSON.stringify({ message: 'Method Not Allowed' }),
+      statusCode: 400,
+      body: JSON.stringify({ success: false, message: 'Missing task details' }),
     };
   }
 
   try {
-    const { taskId } = JSON.parse(event.body);
-
-    // Update the task status in Firebase
-    await db.ref(`tasks/${taskId}`).update({ status: 'ready' });
-
+    // In a real implementation, you'd save the task completion details to a database
+    console.log(`Task ${taskId} completed with email: ${email} and password: ${password}`);
+    
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, message: 'Task confirmed successfully' }),
+      body: JSON.stringify({ success: true, message: 'Task submitted successfully' }),
     };
   } catch (error) {
+    console.error('Error confirming task:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, message: 'Internal Server Error' }),
+      body: JSON.stringify({ success: false, message: 'Error confirming task' }),
     };
   }
 };
