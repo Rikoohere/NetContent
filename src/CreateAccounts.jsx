@@ -3,6 +3,7 @@ import "./CreateAccounts.css";
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, onValue, push } from "firebase/database";
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyBoPAyG-HKt-eVh-v70fFwRAZmG-8Cbur0",
   authDomain: "adcontent-2b1fd.firebaseapp.com",
