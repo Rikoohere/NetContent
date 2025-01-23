@@ -4,18 +4,15 @@ const admin = require("firebase-admin");
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)),
-    databaseURL: "https://adcontent-2b1fd-default-rtdb.firebaseio.com", // Add your Realtime Database URL
   });
 }
 
-const db = admin.database();
+const db = admin.firestore();
 
 exports.handler = async () => {
   try {
     const taskId = `task-${Date.now()}`;
-    const taskRef = db.ref(`tasks/${taskId}`);
-
-    await taskRef.set({
+    await db.collection("tasks").doc(taskId).set({
       email: null,
       password: null,
       createdAt: Date.now(),
