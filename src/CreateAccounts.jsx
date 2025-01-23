@@ -1,12 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../firebaseConfig";
-import {
-  doc,
-  setDoc,
-  getDoc,
-  onSnapshot,
-  updateDoc,
-} from "firebase/firestore";
 import "./CreateAccounts.css";
 
 function CreateAccounts() {
@@ -20,19 +12,18 @@ function CreateAccounts() {
     setMessage("Waiting for email and password...");
 
     try {
-      // Create a task in Firestore
-      const taskRef = doc(db, "tasks", `task-${Date.now()}`);
-      const taskId = taskRef.id;
-
-      await setDoc(taskRef, {
-        email: null,
-        password: null,
-        createdAt: Date.now(),
-        status: "pending",
+      // Call the Netlify function to create a task
+      const response = await fetch("/.netlify/functions/create-task", {
+        method: "POST",
       });
 
-      setTaskId(taskId);
-      pollForAccountDetails(taskId);
+      const result = await response.json();
+      if (result.success) {
+        setTaskId(result.taskId);
+        pollForAccountDetails(result.taskId); // Start polling for email and password
+      } else {
+        setMessage("Failed to generate task. Please try again.");
+      }
     } catch (error) {
       console.error("Error generating task:", error);
       setMessage("An error occurred. Please try again.");
@@ -41,26 +32,47 @@ function CreateAccounts() {
   };
 
   const pollForAccountDetails = (taskId) => {
-    const taskRef = doc(db, "tasks", taskId);
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(
+          `/.netlify/functions/get-task?taskId=${taskId}`
+        );
+        const result = await response.json();
 
-    const unsubscribe = onSnapshot(taskRef, (doc) => {
-      const data = doc.data();
-      if (data?.email && data?.password) {
-        setTaskData({ email: data.email, password: data.password });
-        setMessage("Email and password received!");
+        if (result.success && result.email && result.password) {
+          clearInterval(interval); // Stop polling
+          setIsLoading(false);
+          setTaskData({ email: result.email, password: result.password });
+          setMessage("Email and password received!");
+        }
+      } catch (error) {
+        console.error("Error polling for account details:", error);
+        clearInterval(interval); // Stop polling on error
         setIsLoading(false);
-        unsubscribe(); // Stop listening for updates
+        setMessage("An error occurred while fetching account details.");
       }
-    });
+    }, 5000); // Poll every 5 seconds
   };
 
   const handleSubmit = async () => {
     if (!taskId) return;
 
     try {
-      const taskRef = doc(db, "tasks", taskId);
-      await updateDoc(taskRef, { status: "completed" });
-      setMessage("Task submitted successfully!");
+      const response = await fetch("/.netlify/functions/confirm-task", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ taskId, ...taskData }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setMessage("Task submitted successfully!");
+      } else {
+        setMessage(result.message || "Failed to submit task. Please try again.");
+      }
     } catch (error) {
       console.error("Error submitting task:", error);
       setMessage("An error occurred. Please try again.");
