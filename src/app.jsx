@@ -6,6 +6,7 @@ import CompleteCaptchas from './CompleteCaptchas';
 import scriptsData from './robloxscripts.json'; // Import scripts data
 import crackedData from './cracked.json'; // Import games data
 import minecraftModsData from './minecraftmods.json'; // Import Minecraft mods data
+import AdminPanel from './AdminPanel';
 
 function Home() {
   const location = useLocation();
@@ -126,6 +127,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/create-accounts" element={<CreateAccounts />} />
           <Route path="/complete-captchas" element={<CompleteCaptchas />} />
+          <Route path='/admin' element={<AdminPanel/>} />
         </Routes>
         <footer>
           <p>&copy; 2023 NetContent. All rights reserved.</p>

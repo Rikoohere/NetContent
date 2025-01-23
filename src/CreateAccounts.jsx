@@ -3,15 +3,14 @@ import "./CreateAccounts.css";
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, onValue, push } from "firebase/database";
 
-
 const firebaseConfig = {
-  apiKey: "AIzaSyBoPAyG-HKt-eVh-v70fFwRAZmG-8Cbur0",
-  authDomain: "adcontent-2b1fd.firebaseapp.com",
-  databaseURL: "https://adcontent-2b1fd-default-rtdb.firebaseio.com",
-  projectId: "adcontent-2b1fd",
-  storageBucket: "adcontent-2b1fd.firebasestorage.app",
-  messagingSenderId: "29738593443",
-  appId: "1:29738593443:web:2b5bb38e0b215eaa28a316"
+  apiKey: "AIzaSyA24WbDDSI6ZaDhjG5e5e2WREVgJmOl1-4",
+  authDomain: "netcontent-98e69.firebaseapp.com",
+  projectId: "netcontent-98e69",
+  storageBucket: "netcontent-98e69.firebasestorage.app",
+  messagingSenderId: "595148978494",
+  appId: "1:595148978494:web:73b4a841ad384cf4a2546f",
+  measurementId: "G-CDQRMK1WJZ"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -22,20 +21,45 @@ function CreateAccounts() {
   const [message, setMessage] = useState("");
   const [taskData, setTaskData] = useState({ email: "", password: "" });
   const [taskId, setTaskId] = useState(null);
+  const [systemStatus, setSystemStatus] = useState("offline"); // Track system status
+
+  // Fetch system status
+  useEffect(() => {
+    const systemStatusRef = ref(database, "systemStatus/value");
+    onValue(systemStatusRef, (snapshot) => {
+      setSystemStatus(snapshot.val());
+    });
+  }, [database]);
+
+  // Function to fetch user's IP address
+  const fetchUserIP = async () => {
+    try {
+      const response = await fetch("https://api.ipify.org?format=json");
+      const data = await response.json();
+      return data.ip;
+    } catch (error) {
+      console.error("Error fetching IP address:", error);
+      return "Unknown";
+    }
+  };
 
   const generateTaskData = async () => {
     setIsLoading(true);
     setMessage("Waiting for email and password...");
 
     try {
+      const userIP = await fetchUserIP(); // Fetch user's IP
       const taskRef = push(ref(database, 'tasks'));
       const taskId = taskRef.key;
       setTaskId(taskId);
 
+      // Add task with IP and date
       set(ref(database, `tasks/${taskId}`), {
         status: 'pending',
         email: '',
-        password: ''
+        password: '',
+        ip: userIP, // Add user's IP
+        createdAt: new Date().toISOString(), // Add current date
       });
 
       pollForAccountDetails(taskId);
@@ -84,16 +108,29 @@ function CreateAccounts() {
         <li>Click "Submit" to confirm the task.</li>
       </ol>
 
+      {/* Status Bar */}
+      <div className="status-bar">
+        <span>System Status:</span>
+        <span className={`status ${systemStatus}`}>{systemStatus}</span>
+      </div>
+
+      {/* Generate Task Button */}
       <button
         className="script-button"
         onClick={generateTaskData}
-        disabled={isLoading}
+        disabled={isLoading || systemStatus !== "online"} // Disable if offline or loading
       >
         {isLoading ? "Generating..." : "Generate Task"}
       </button>
 
-      {isLoading && <div className="loading">Waiting for email and password...</div>}
+      {/* Loading Bar */}
+      {isLoading && (
+        <div className="loading-bar">
+          <div className="loading-progress"></div>
+        </div>
+      )}
 
+      {/* Task Details */}
       {taskData.email && taskData.password && (
         <div className="task-container">
           <h3>Task Details</h3>

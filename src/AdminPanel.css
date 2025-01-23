@@ -1,0 +1,133 @@
+/* General Styles */
+.admin-panel {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #1e1e1e; /* Dark background */
+  color: #e0e0e0; /* Light text color */
+}
+
+.admin-title {
+  text-align: center;
+  color: #e0e0e0; /* Light text color */
+  margin-bottom: 20px;
+}
+
+/* System Status Section */
+.system-status {
+  background-color: #2d2d2d; /* Darker background */
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #e0e0e0; /* Light text color */
+}
+
+.status-title {
+  font-size: 1.5rem;
+  color: #e0e0e0; /* Light text color */
+  margin-bottom: 10px;
+}
+
+.status {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status.online {
+  color: #28a745; /* Green */
+}
+
+.status.offline {
+  color: #dc3545; /* Red */
+}
+
+.toggle-button {
+  padding: 10px 20px;
+  background-color: #007bff; /* Blue */
+  color: white; /* White text */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-button:hover {
+  background-color: #0056b3; /* Darker blue */
+}
+
+/* Requests Table */
+.requests-title {
+  font-size: 1.5rem;
+  color: #e0e0e0; /* Light text color */
+  margin-bottom: 20px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #2d2d2d; /* Darker background */
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #444; /* Darker border */
+  color: #e0e0e0; /* Light text color */
+}
+
+th {
+  background-color: #007bff; /* Blue */
+  color: white; /* White text */
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: #3d3d3d; /* Darker background on hover */
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background-color: #ffc107; /* Yellow */
+  color: #333; /* Dark text */
+}
+
+.status-badge.ready {
+  background-color: #17a2b8; /* Teal */
+  color: white; /* White text */
+}
+
+.status-badge.completed {
+  background-color: #28a745; /* Green */
+  color: white; /* White text */
+}
+
+input, select {
+  padding: 8px;
+  border: 1px solid #444; /* Darker border */
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #2d2d2d; /* Darker background */
+  color: #e0e0e0; /* Light text color */
+}
+
+input:focus, select:focus {
+  border-color: #007bff; /* Blue */
+  outline: none;
+}
