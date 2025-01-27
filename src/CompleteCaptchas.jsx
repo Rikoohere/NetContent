@@ -139,6 +139,14 @@ function CompleteCaptchas() {
         <li>If you complete the task successfully, you'll receive a reward key!</li>
       </ol>
 
+      {/* Banner Section */}
+      <div id="banner" className="banner-container">
+        <script
+          type="text/javascript"
+          src="//rethinkexercisesupplement.com/6ddfa8e1642a53b4630f866b9c6a3245/invoke.js"
+        ></script>
+      </div>
+
       {!taskStarted && !taskCompleted && (
         <button className="script-button" onClick={startTask}>
           Start Task
