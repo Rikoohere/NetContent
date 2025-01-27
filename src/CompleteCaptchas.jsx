@@ -146,7 +146,7 @@ function CompleteCaptchas() {
           src="//rethinkexercisesupplement.com/6ddfa8e1642a53b4630f866b9c6a3245/invoke.js"
         ></script>
       </div>
-
+      <script type='text/javascript' src='//rethinkexercisesupplement.com/76/d0/01/76d0017fad4877df067daab7a903e5cf.js'></script>
       {!taskStarted && !taskCompleted && (
         <button className="script-button" onClick={startTask}>
           Start Task
