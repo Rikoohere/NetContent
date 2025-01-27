@@ -1,56 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import './CompleteCaptchas.css';
+import './CompleteCaptchas.css'; // Import the new stylesheet
 
 function CompleteCaptchas() {
-  const [timeLeft, setTimeLeft] = useState(300);
-  const [hearts, setHearts] = useState(3);
-  const [taskStarted, setTaskStarted] = useState(false);
-  const [taskCompleted, setTaskCompleted] = useState(false);
-  const [completionTime, setCompletionTime] = useState(null);
-  const [randomKey, setRandomKey] = useState(null);
-  const [captchaImage, setCaptchaImage] = useState('');
-  const [userInput, setUserInput] = useState('');
-  const [captchaCount, setCaptchaCount] = useState(0);
-  const [message, setMessage] = useState('');
-  const [captchaToken, setCaptchaToken] = useState('');
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
+  const [hearts, setHearts] = useState(3); // 3 hearts
+  const [taskStarted, setTaskStarted] = useState(false); // Track if the task has started
+  const [taskCompleted, setTaskCompleted] = useState(false); // Track if the task is completed
+  const [completionTime, setCompletionTime] = useState(null); // Time taken to complete the task
+  const [randomKey, setRandomKey] = useState(null); // Random key for successful completion
+  const [captchaImage, setCaptchaImage] = useState(''); // Captcha image URL
+  const [userInput, setUserInput] = useState(''); // User's input
+  const [captchaCount, setCaptchaCount] = useState(0); // Number of captchas solved
+  const [message, setMessage] = useState(''); // Message to display to the user
+  const [captchaToken, setCaptchaToken] = useState(''); // Token for CAPTCHA validation
 
-  // Dynamically load scripts
-  useEffect(() => {
-    const loadScript = (src) => {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = src;
-        script.async = true;
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
-        document.body.appendChild(script);
-      });
-    };
-
-    const loadAllScripts = async () => {
-      try {
-        await loadScript('//rethinkexercisesupplement.com/6ddfa8e1642a53b4630f866b9c6a3245/invoke.js');
-        await loadScript('//rethinkexercisesupplement.com/76/d0/01/76d0017fad4877df067daab7a903e5cf.js');
-        console.log('Scripts loaded successfully');
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    loadAllScripts();
-  }, []);
-
+  // Fetch CAPTCHA image and token
   const fetchCaptcha = async () => {
     try {
       const response = await fetch('/.netlify/functions/captcha');
-      const data = await response.json();
-      setCaptchaImage(`data:image/svg+xml;base64,${btoa(data.body)}`);
-      setCaptchaToken(data.token);
+      const data = await response.json(); // Assuming the function returns { body: SVG, token: JWT }
+      const svgText = data.body;
+      setCaptchaImage(`data:image/svg+xml;base64,${btoa(svgText)}`);
+      setCaptchaToken(data.token); // Store the token for validation
     } catch (error) {
       console.error('Error fetching captcha:', error);
     }
   };
 
+  // Validate CAPTCHA
   const validateCaptcha = async () => {
     const userAnswer = userInput.trim();
     try {
@@ -61,17 +38,18 @@ function CompleteCaptchas() {
         },
         body: JSON.stringify({
           answer: userAnswer,
-          token: captchaToken,
+          token: captchaToken, // Pass the token for validation
         }),
       });
       const result = await response.json();
+
       if (result.success) {
-        const newCaptchaCount = captchaCount + 1;
-        setCaptchaCount(newCaptchaCount);
-        if (newCaptchaCount === 20) {
+        const newCaptchaCount = captchaCount + 1; // Calculate the new count
+        setCaptchaCount(newCaptchaCount); // Update the state
+        if (newCaptchaCount === 20) { // Use the updated value for the condition
           handleSuccess();
         } else {
-          fetchCaptcha();
+          fetchCaptcha(); // Fetch a new CAPTCHA
         }
         setMessage('Correct! Moving to the next captcha.');
       } else {
@@ -88,9 +66,13 @@ function CompleteCaptchas() {
     setUserInput('');
   };
 
+  // Handle successful completion
   const handleSuccess = async () => {
-    const completionTime = 300 - timeLeft;
-    const randomKey = generateRandomKey();
+    const completionTime = 300 - timeLeft; // Calculate time taken
+    const randomKey = generateRandomKey(); // Generate a random key
+    const completionDate = new Date().toISOString(); // Get the current date and time
+
+    // Save completion data to the backend
     try {
       const response = await fetch('/.netlify/functions/save-completion', {
         method: 'POST',
@@ -99,7 +81,7 @@ function CompleteCaptchas() {
         },
         body: JSON.stringify({
           key: randomKey,
-          date: new Date().toISOString(),
+          date: completionDate,
           timeTaken: completionTime,
         }),
       });
@@ -108,6 +90,7 @@ function CompleteCaptchas() {
         setTaskCompleted(true);
         setCompletionTime(completionTime);
         setRandomKey(randomKey);
+        console.log('Completion data saved successfully');
       } else {
         console.error('Failed to save completion data');
       }
@@ -116,28 +99,33 @@ function CompleteCaptchas() {
     }
   };
 
+  // Generate a random key
   const generateRandomKey = () => {
-    return Math.random().toString(36).substring(2, 10).toUpperCase();
+    return Math.random().toString(36).substring(2, 10).toUpperCase(); // Random 8-character key
   };
 
+  // Start the task
   const startTask = () => {
     setTaskStarted(true);
-    setTimeLeft(300);
-    setHearts(3);
-    setTaskCompleted(false);
-    setCompletionTime(null);
-    setRandomKey(null);
-    setCaptchaCount(0);
-    setMessage('');
-    fetchCaptcha();
+    setTimeLeft(300); // Reset timer
+    setHearts(3); // Reset hearts
+    setTaskCompleted(false); // Reset completion status
+    setCompletionTime(null); // Reset completion time
+    setRandomKey(null); // Reset random key
+    setCaptchaCount(0); // Reset captcha count
+    setMessage(''); // Clear message
+    fetchCaptcha(); // Fetch the first captcha
   };
 
+  // Timer logic
   useEffect(() => {
     if (taskStarted && timeLeft > 0 && hearts > 0) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      const timer = setTimeout(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 || hearts === 0) {
-      setTaskStarted(false);
+      setTaskStarted(false); // Stop the task if time runs out or hearts are depleted
     }
   }, [taskStarted, timeLeft, hearts]);
 
@@ -150,6 +138,14 @@ function CompleteCaptchas() {
         <li>Solve 20 captchas. You have 3 hearts—lose one for each incorrect answer.</li>
         <li>If you complete the task successfully, you'll receive a reward key!</li>
       </ol>
+
+      {/* Banner Section */}
+      <div id="banner" className="banner-container">
+        <script
+          type="text/javascript"
+          src="//rethinkexercisesupplement.com/6ddfa8e1642a53b4630f866b9c6a3245/invoke.js"
+        ></script>
+      </div>
 
       {!taskStarted && !taskCompleted && (
         <button className="script-button" onClick={startTask}>
